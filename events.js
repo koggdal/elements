@@ -2,9 +2,9 @@
 events
 */"use strict"
 
-var $       = require("./index"),
-    prime   = require("prime"),
-    Emitter = require("prime/emitter")
+var Emitter = require("prime/emitter")
+
+var $ = require("./base")
 
 var html = document.documentElement
 
@@ -50,29 +50,19 @@ $.implement({
 
                 Emitter.prototype.off.call(self, event, handle)
 
-                var empty = true, k, l
-                for (k in events){
-                    empty = false
-                    break
-                }
-
-                if (empty){
+                if (!self._listeners || !self._listeners[event]){
                     removeEventListener(node, event, domEvent)
                     delete domListeners[event]
 
-                    for (l in domListeners){
-                        empty = false
-                        break
-                    }
-
-                    if (empty) delete self._domListeners
+                    for (var l in domListeners) return
+                    delete self._domListeners
                 }
 
             }
         })
     },
 
-    emit: function(event){
+    emit: function(){
         var args = arguments
         return this.forEach(function(node){
             Emitter.prototype.emit.apply($(node), args)
